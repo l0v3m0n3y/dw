@@ -26,7 +26,7 @@ public class Dw {
     
     public init() {
         self.headers = [
-        "Accept":"application/json",
+        "Accept":"*/*",
         "Connection":"keep-alive",
         "Accept-Encoding":"deflate, zstd",
         "Accept-Language":"en-US,en;q=0.9",
