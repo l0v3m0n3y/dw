@@ -20,6 +20,14 @@ extension URLSession {
     }
 }
 
+public enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case patch = "PATCH"
+}
+
 public class Dw {
     private let api = "https://www.dw.com/graph-api"
     private var headers: [String: String]
