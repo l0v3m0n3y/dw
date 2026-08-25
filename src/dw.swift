@@ -36,58 +36,42 @@ public class Dw {
 
     }
     
-    public func get_breaking_news(lang: String="ru") async throws -> Any {
-        guard let url = URL(string: "\(api)/\(lang)/breaking-news") else {
+    private func fetchJSON(from urlString: String,method: HTTPMethod = .get,body: Data? = nil,queryParameters: [String: String]? = nil) async throws -> Any {
+        var urlComponents = URLComponents(string: urlString)
+        if let queryParameters = queryParameters {
+            urlComponents?.queryItems = queryParameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
+        guard let url = urlComponents?.url else {
             throw NSError(domain: "Invalid URL", code: -1)
         }
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = headers
+        if let body = body {
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
         let (data, _) = try await URLSession.shared.data(for: request)
         return try JSONSerialization.jsonObject(with: data)
     }
     
-    public func get_content_article(lang: String="ru",type: String="article",content_id: Int) async throws -> Any {
-        guard let url = URL(string: "\(api)/\(lang)/content/\(type)/\(content_id)") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONSerialization.jsonObject(with: data)
+    public func getBreakingNews(lang: String="ru") async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(lang)/breaking-news")
     }
     
-    public func top_story_zone_list(lang: String="ru") async throws -> Any {
-        guard let url = URL(string: "\(api)/\(lang)/top-story-zone") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONSerialization.jsonObject(with: data)
+    public func getContentArticle(lang: String="ru",type: String="article",contentId: Int) async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(lang)/content/\(type)/\(contentId)")
     }
     
-    public func top_story_zone(lang: String="ru",story_id: Int) async throws -> Any {
-        guard let url = URL(string: "\(api)/\(lang)/top-story-zone/\(story_id)") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONSerialization.jsonObject(with: data)
+    public func topStoryZoneList(lang: String="ru") async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(lang)/top-story-zone")
     }
     
-    public func get_livestream(lang: String="ru",full_lang: String="russian") async throws -> Any {
-        guard let url = URL(string: "\(api)/\(lang)/livestream/\(full_lang)") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONSerialization.jsonObject(with: data)
+    public func topStoryZone(lang: String="ru",storyId: Int) async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(lang)/top-story-zone/\(storyId)")
+    }
+    
+    public func getLivestream(lang: String="ru",fullLang: String="russian") async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(lang)/livestream/\(fullLang)")
     }
 }
